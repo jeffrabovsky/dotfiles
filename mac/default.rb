@@ -17,38 +17,11 @@ define :vscode_exentsion do
   end
 end
 
-define :ruby_install do
-  version = params[:name]
-  execute "installing ruby #{version}" do
-    command "ruby-install ruby '#{version}'"
-    not_if "test -e $HOME/.rubies/ruby-#{version}"
-  end
-end
-
-define :pyenv_install do
-  version = params[:name]
-  execute "installing python #{version}" do
-    command "pyenv install '#{version}'"
-    not_if "test -e $HOME/.pyenv/versions/#{version}"
-  end
-end
-
 USER = run_command('whoami').stdout.chomp
-LATEST_RUBY_VERSION = run_command('curl -sS https://raw.githubusercontent.com/postmodern/ruby-versions/master/ruby/stable.txt | tail -n 1').stdout.chomp
 MAC_DIR = File.expand_path(File.dirname(__FILE__))
-LATEST_PYTHON_VERSION = JSON.parse(run_command("curl -sS 'https://api.github.com/repos/python/cpython/tags'").stdout)
-                            .map{ |tag| tag["name"] }
-                            .select { |name| name =~ /\d+\.\d+\.\d+$/ }
-                            .map { |name| name.gsub("v", "") }
-                            .sort
-                            .reverse
-                            .first
-
-# TODO: use asdf (or what https://omakub.org/ uses?) instead of language specific tools
 
 PACKAGES = ['awscli',
             'bat',
-            'chruby',
             'cloc',
             'docker-compose',
             'docker',
@@ -59,13 +32,11 @@ PACKAGES = ['awscli',
             'ispell',
             'jq',
             'kubernetes-cli',
-            'mysql',
             'node',
             'openjdk',
-            'p7zip',
-            'pipx',
-            'pyenv',
-            'ruby-install',
+            'postgresql',
+            'postgresql@16',
+            'python',
             'ruby',
             'shellcheck',
             'the_silver_searcher',
@@ -89,9 +60,6 @@ end
 PACKAGES.each { |package_name| package package_name }
 CASKS.each { |cask_name| cask cask_name }
 VSCODE_EXENTSIONS.each { |extension_name| vscode_exentsion extension_name }
-
-ruby_install LATEST_RUBY_VERSION
-pyenv_install LATEST_PYTHON_VERSION
 
 link "/Users/#{USER}/.pryrc" do
   to "#{MAC_DIR}/files/.pryrc"
@@ -123,7 +91,7 @@ link "/Users/#{USER}/Library/Application Support/Code/User/keybindings.json" do
   force true
 end
 
-template "/Users/#{USER}/.zshrc" do
-  variables ruby_version: LATEST_RUBY_VERSION,
-            python_version: LATEST_PYTHON_VERSION
+link "/Users/#{USER}/.zshrc" do
+  to "#{MAC_DIR}/files/.zshrc"
+  force true
 end
