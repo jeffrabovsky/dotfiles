@@ -40,3 +40,43 @@ source <(helm completion zsh)
 if [[ -f ~/generate_j_aliases.sh ]]; then
   . ~/generate_j_aliases.sh
 fi
+
+alias k=kubectl
+compdef k=kubectl
+
+claude-docker() {
+  touch ~/.claude.json
+  local mounts=(
+    -v "$HOME/.claude:/root/.claude"
+    -v "$HOME/.claude.json:/root/.claude.json"
+  )
+
+  if [ $# -gt 0 ]; then
+    local host_path
+    host_path=$(cd "$1" 2>/dev/null && pwd) || {
+      echo "claude-docker: not a directory: $1" >&2
+      return 1
+    }
+    mounts+=(-v "$host_path:/workspace")
+  fi
+
+  docker run --rm -it "${mounts[@]}" \
+  claude-code bash -c "IS_SANDBOX=1 claude --dangerously-skip-permissions"
+}
+
+claude-docker-bash() {
+  touch ~/.claude.json
+  local mounts=(
+    -v "$HOME/.claude:/root/.claude"
+    -v "$HOME/.claude.json:/root/.claude.json"
+  )
+  if [ $# -gt 0 ]; then
+    local host_path
+    host_path=$(cd "$1" 2>/dev/null && pwd) || {
+      echo "claude-docker: not a directory: $1" >&2
+      return 1
+    }
+    mounts+=(-v "$host_path:/workspace")
+  fi
+  docker run --rm -it "${mounts[@]}" claude-code bash
+}

@@ -63,5 +63,6 @@
 
     // use SSH keys for Github auth, don't prompt for user/password
     "github.gitAuthentication": false,
-    "git.terminalAuthentication": false
+    "git.terminalAuthentication": false,
+    "terminal.integrated.initialHint": false
 }

@@ -24,6 +24,15 @@
     { "key": "alt+;", "command": "editor.action.commentLine",
     "when": "editorTextFocus && !editorReadonly" },
 
+  {
+    "key": "shift+enter",
+    "command": "workbench.action.terminal.sendSequence",
+    "args": {
+      "text": "\u000D"
+    },
+    "when": "terminalFocus"
+  },
+
     /* TODO: figure out why this doesnt work, also horizontal split in terminal
     {
         "key": "ctrl+x k",
